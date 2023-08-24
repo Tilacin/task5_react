@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import StarRating from "./StarRating";
 
 const average = (arr) =>
@@ -14,10 +14,10 @@ export default function App() {
   const [selectedId, setSelectedId] = useState(null);
 
   // const [watched, setWatched] = useState([]);
-   const [watched, setWatched] = useState(function (){
-    const storedValue = localStorage.getItem("watched")
-    return JSON.parse(storedValue)
-   });
+  const [watched, setWatched] = useState(function () {
+    const storedValue = localStorage.getItem("watched");
+    return JSON.parse(storedValue);
+  });
 
   function handleSelectMovie(id) {
     setSelectedId((selectedId) => (id === selectedId ? null : id));
@@ -165,6 +165,24 @@ function Numresults({ movies }) {
 }
 
 function Search({ query, setQuery }) {
+  const inputEl = useRef(null);
+
+  useEffect(function () {
+    function callback(e) {
+//если фокус в поле ввода, то ничего не делать(иначе стирался бы введённый текст)
+      if(document.activeElement === inputEl.current) return
+
+//при нажатии на интер фокус пернемещается в поле ввода
+      if (e.code === "Enter") {
+        inputEl.current.focus();
+        setQuery("");
+      }
+    }
+
+    document.addEventListener("keydown", callback);
+    return () => document.addEventListener("keydown", callback);
+  }, [setQuery]);
+
   return (
     <input
       className="search"
@@ -172,6 +190,7 @@ function Search({ query, setQuery }) {
       placeholder="Search movies..."
       value={query}
       onChange={(e) => setQuery(e.target.value)}
+      ref={inputEl}
     />
   );
 }
@@ -452,4 +471,4 @@ function WatchedMovie({ movie, onDeleteWatched }) {
     </li>
   );
 }
-// 155
+// 168
