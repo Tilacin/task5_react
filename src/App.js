@@ -167,21 +167,24 @@ function Numresults({ movies }) {
 function Search({ query, setQuery }) {
   const inputEl = useRef(null);
 
-  useEffect(function () {
-    function callback(e) {
-//если фокус в поле ввода, то ничего не делать(иначе стирался бы введённый текст)
-      if(document.activeElement === inputEl.current) return
+  useEffect(
+    function () {
+      function callback(e) {
+        //если фокус в поле ввода, то ничего не делать(иначе стирался бы введённый текст)
+        if (document.activeElement === inputEl.current) return;
 
-//при нажатии на интер фокус пернемещается в поле ввода
-      if (e.code === "Enter") {
-        inputEl.current.focus();
-        setQuery("");
+        //при нажатии на интер фокус пернемещается в поле ввода
+        if (e.code === "Enter") {
+          inputEl.current.focus();
+          setQuery("");
+        }
       }
-    }
 
-    document.addEventListener("keydown", callback);
-    return () => document.addEventListener("keydown", callback);
-  }, [setQuery]);
+      document.addEventListener("keydown", callback);
+      return () => document.addEventListener("keydown", callback);
+    },
+    [setQuery]
+  );
 
   return (
     <input
@@ -242,6 +245,15 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
   const [isLoading, setIsLoading] = useState(false);
   const [userRating, setUserRating] = useState("");
 
+  const countRef = useRef(0);
+
+  useEffect(
+    function () {
+      if (userRating) countRef.current++;
+    },
+    [userRating]
+  );
+
   const isWatched = watched.map((movie) => movie.imdbID).includes(selectedId);
   const watchedUserRating = watched.find(
     (movie) => movie.imdbID === selectedId
@@ -269,6 +281,7 @@ function MovieDetails({ selectedId, onCloseMovie, onAddWatched, watched }) {
       imdbRating: Number(imdbRating),
       runtime: Number(runtime.split(" ").at(0)),
       userRating,
+      countRatingDecisions: countRef.current,
     };
 
     onAddWatched(newWatchedMovie);
@@ -471,4 +484,4 @@ function WatchedMovie({ movie, onDeleteWatched }) {
     </li>
   );
 }
-// 168
+// 170
